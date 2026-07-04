@@ -22,8 +22,8 @@
 ## 安裝
 
 ```bash
-git clone https://github.com/zenbuapps/claude-skill-auto-seo-writer.git
-cp -r claude-skill-auto-seo-writer/auto-seo-writer ~/.claude/skills/
+git clone https://github.com/zenbuapps/seo-writer.git
+cp -r seo-writer/auto-seo-writer ~/.claude/skills/
 ```
 
 裝完後在 Claude Code 說「幫我寫一篇關於 X 的 SEO 文章」就會觸發。

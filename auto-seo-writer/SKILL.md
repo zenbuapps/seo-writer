@@ -119,18 +119,9 @@ Our Differentiation:
 Recommended word count: [X,XXX] (competitor avg + 20%)
 Recommended format: [guide / listicle / comparison]
 
-Real-example requests — REQUIRED whenever the outline contains ANY
-first-person content. List EVERY first-person slot with its status:
-========================================================================
-[section A]: ✓ covered by first-party material ([which source])
-[section B]: MISSING — pick one:
-             (a) share the real case / actual details, or
-             (b) approve an explicitly generic scenario (written as
-                 「想像一下」/「常見的情境」, never in your voice), or
-             (c) drop this slot.
-
-Writing may NOT begin until every first-person slot is resolved:
-sourced / user-provided / user-approved generic / dropped.
+Case material status (one line per first-person slot):
+  ✓ [section A] — covered by first-party material ([which source])
+  ? [section B, C] — will interview you after you approve the outline
 
 Proposed Outline
 ================
@@ -153,6 +144,37 @@ Proceed? Or adjust anything?
 ```
 
 Wait for user confirmation. If user adjusts, revise and re-present. Only proceed when approved.
+
+---
+
+## Phase 1.5: Case Interview (only if slots lack material)
+
+Runs right after the outline is approved, for first-person slots NOT covered
+by first-party material. This is a short exploratory interview, NOT a form —
+one open question at a time, conversational tone.
+
+1. **Open broad.** One question, all slots at once:
+   「這篇有幾個地方放你的真實案例會很加分：〔段落 1、2、3〕。
+   你有沒有相關的經驗？想到什麼講什麼，不用完整。」
+2. **Dig when they bite.** When the user mentions anything, follow up like
+   an interviewer — at most 1–3 short questions per case（什麼時候？後來呢？
+   有具體數字嗎？）. Stop as soon as you have enough for one vivid
+   paragraph. Never interrogate.
+3. **Offer an out when they don't.** If the user doesn't want to share
+   details or has nothing:
+   - 「那我幫你編一個？給我一個大方向就好」(user gives direction, AI drafts)
+   - 「或是我提一個方向，你看行不行」(AI proposes direction, then drafts)
+   - rewrite the slot as a non-first-person generic scenario, or drop it.
+4. **Confirm before writing — always.** Any case the AI drafted, or any
+   detail extrapolated beyond what the user literally said, must be played
+   back verbatim before Phase 2:
+   「這個案例我打算這樣寫：『……』這樣 OK 嗎？」
+   Only approved drafts enter the article. Once the user approves the
+   concrete text, it may be written in their first person — approval
+   transfers ownership.
+
+Keep the whole interview to a handful of turns. It does not count as a
+checkpoint; it is a conversation.
 
 ---
 
@@ -195,21 +217,15 @@ Every H2 section must contain at least ONE concrete artifact:
 An H2 that is only abstract explanation fails Checkpoint 2. Framework tells,
 examples sell.
 
-### Real experiences only — NEVER fabricate
+### Real experiences only — NEVER fabricate silently
 First-person stories are E-E-A-T gold precisely because they are real:
-- Use ONLY experiences found in first-party material or told to you by the
-  user. A story's *existence* in the material does not license inventing its
+- Use ONLY experiences found in first-party material, told to you by the
+  user, or drafted-and-approved via the Case Interview (Phase 1.5). A
+  story's *existence* in the material does not license inventing its
   *details* — numbers ("花了 20 分鐘"), prices, file contents, dialogue,
-  "我的學員…" anecdotes are all off-limits unless sourced.
-- Details you need but don't have: ask at CHECKPOINT 1 via the
-  "Real-example requests" block. Batch all asks there — do not scatter
-  questions through the flow. This ask is MANDATORY, not best-effort.
-- Inventing ANY example without the user's explicit approval is
-  forbidden. If the user has no real case for a slot, the only allowed
-  paths are the ones the user picks at Checkpoint 1: a user-approved,
-  explicitly generic scenario (「想像一下」「常見的情境是」— never in the
-  user's first person), or dropping the slot.
-- Do not start Phase 2 while any first-person slot is unresolved.
+  "我的學員…" anecdotes are all off-limits unless sourced or approved.
+- Do not start Phase 2 while any first-person slot is unresolved
+  (sourced / user-told / user-approved draft / rewritten generic / dropped).
 
 Fabricated experience is worse than no experience: one reader asking the
 author about it destroys the trust E-E-A-T exists to build.
@@ -292,7 +308,8 @@ AEO Optimization:
 E-E-A-T / Richness:
   [pass/fail] First-person testing/operation descriptions — every specific
               (number, price, file content, anecdote) traceable to
-              first-party material or user-provided facts; none invented
+              first-party material, user-told facts, or a Case-Interview
+              draft the user approved verbatim; nothing silently invented
   [pass/fail] Credible external sources cited
   [pass/fail] Author info configured
   [pass/fail] Every H2 has >= 1 concrete artifact (copyable prompt,

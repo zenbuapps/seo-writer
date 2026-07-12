@@ -119,12 +119,18 @@ Our Differentiation:
 Recommended word count: [X,XXX] (competitor avg + 20%)
 Recommended format: [guide / listicle / comparison]
 
-Real-example requests (include ONLY if first-person slots lack material)
+Real-example requests — REQUIRED whenever the outline contains ANY
+first-person content. List EVERY first-person slot with its status:
 ========================================================================
 [section A]: ✓ covered by first-party material ([which source])
-[section B]: MISSING — please share a real case / the actual details,
-             or reply "none" → will be written as a generic scenario
-             (not attributed to you)
+[section B]: MISSING — pick one:
+             (a) share the real case / actual details, or
+             (b) approve an explicitly generic scenario (written as
+                 「想像一下」/「常見的情境」, never in your voice), or
+             (c) drop this slot.
+
+Writing may NOT begin until every first-person slot is resolved:
+sourced / user-provided / user-approved generic / dropped.
 
 Proposed Outline
 ================
@@ -197,10 +203,13 @@ First-person stories are E-E-A-T gold precisely because they are real:
   "我的學員…" anecdotes are all off-limits unless sourced.
 - Details you need but don't have: ask at CHECKPOINT 1 via the
   "Real-example requests" block. Batch all asks there — do not scatter
-  questions through the flow.
-- If the user has no real example for a slot, write the passage as an
-  explicitly generic scenario (「想像一下」「常見的情境是」), never in the
-  user's first person.
+  questions through the flow. This ask is MANDATORY, not best-effort.
+- Inventing ANY example without the user's explicit approval is
+  forbidden. If the user has no real case for a slot, the only allowed
+  paths are the ones the user picks at Checkpoint 1: a user-approved,
+  explicitly generic scenario (「想像一下」「常見的情境是」— never in the
+  user's first person), or dropping the slot.
+- Do not start Phase 2 while any first-person slot is unresolved.
 
 Fabricated experience is worse than no experience: one reader asking the
 author about it destroys the trust E-E-A-T exists to build.

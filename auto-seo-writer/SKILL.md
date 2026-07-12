@@ -51,9 +51,11 @@ Only ask these 2 questions (can be in one message):
 ```
 
 > **MCP tool names**: exact tool names depend on the connected MCP server
-> (examples in this skill assume `mcp__wordpress__*`). Check which WordPress
-> MCP tools are actually available in the session before offering option (a);
-> if no WordPress MCP is connected, only offer option (b).
+> (examples in this skill assume `mcp__wordpress__*`). Check which CMS
+> MCP tools are actually available in the session before offering option (a) —
+> WordPress MCP servers AND zenbu site MCP servers (tools like
+> `zenbu_create_article`) both count. If neither is connected, only offer
+> option (b).
 
 If user gives no details, use defaults:
 - Audience: general readers interested in the topic
@@ -64,6 +66,15 @@ Everything else (word count, article type, keyword strategy) is **auto-determine
 ---
 
 ## Phase 1: Parallel Research
+
+**Step 0 — First-party material scan (inline, before launching agents):**
+Check whether the user has first-hand material on this topic: course transcripts
+or subtitles, past articles, video scripts, slides, notes. Look in the working
+directory and project memory first; only ask if a known source is ambiguous.
+If found, extract the user's own framework, terminology, and signature phrases —
+these become the article's backbone and the strongest E-E-A-T signal (real
+first-person experience, not simulated). External research below then *supports*
+the user's framework instead of replacing it.
 
 Launch 3 parallel Agent tasks simultaneously:
 
@@ -149,6 +160,28 @@ Once outline approved, write the full article automatically. Follow these rules:
 - **Authoritativeness**: cite credible sources (reports, official docs, institutions)
 - **Trustworthiness**: mark data sources, update dates, present pros AND cons
 
+### Citation Style — plain language, never academic
+Data points keep source + year (SEO needs them), but weave them into the
+sentence like a person talking, not a paper:
+- ✅ 「OpenAI 跟哈佛的團隊翻了 150 萬則真實對話（2025）」
+- ✅ 「史丹佛和 MIT 的學者找了五千多名客服做實驗（2025）」
+- ❌ 「（NBER Working Paper w34255，2025）」
+- ❌ 「（Brynjolfsson et al.，《Quarterly Journal of Economics》，2025）」
+
+Journal names, paper IDs, and "et al." never appear in the body — describe *who
+found it* instead. Keep full academic references in research notes only.
+
+### Richness Requirements
+Every H2 section must contain at least ONE concrete artifact:
+- a copy-pasteable prompt or command the reader can try today, or
+- a ❌/✅ before-after example, or
+- a bulleted list of real-life scenarios ("接上之後日常長這樣"), or
+- a first-person story from the user's own experience (pull from the Phase 1
+  first-party material).
+
+An H2 that is only abstract explanation fails Checkpoint 2. Framework tells,
+examples sell.
+
 ### Content Format
 - H1 (unique) > H2 (main sections) > H3 (subsections) — never skip levels
 - Paragraphs: 3-5 sentences, under 120 chars per dense block
@@ -169,7 +202,9 @@ Once outline approved, write the full article automatically. Follow these rules:
 
 4. **SEO Meta**:
    - Title Tag (under 60 chars, contains primary keyword)
-   - Meta Description (150-155 chars, has CTA)
+   - Meta Description (has CTA; **length by script**: English 150-155 chars,
+     Chinese 70-80 full-width chars — Google truncates CJK around 80 glyphs,
+     so the 150-155 rule written for English does NOT apply to 中文)
    - Focus Keyword
    - URL Slug (lowercase English, hyphens)
 
@@ -205,7 +240,7 @@ After writing is complete, remove AI writing patterns from the article. This ste
 Present the full article and auto-run quality check:
 
 ```
-Quality Check (X/15)
+Quality Check (X/18)
 ====================
 
 Structure:
@@ -218,24 +253,30 @@ Structure:
 AEO Optimization:
   [pass/fail] Every H2 opens with 40-60 char direct answer
   [pass/fail] Question-format headings
-  [pass/fail] Data points have source + year
+  [pass/fail] Data points have source + year (plain-language style, no
+              journal names / paper IDs in body)
   [pass/fail] FAQPage Schema generated
 
-E-E-A-T Signals:
+E-E-A-T / Richness:
   [pass/fail] First-person testing/operation descriptions
   [pass/fail] Credible external sources cited
   [pass/fail] Author info configured
+  [pass/fail] Every H2 has >= 1 concrete artifact (copyable prompt,
+              ❌/✅ example, scenario list, or first-person story)
 
 SEO Technical:
   [pass/fail] Title Tag <= 60 chars
-  [pass/fail] Meta Description 150-155 chars
+  [pass/fail] Meta Description length OK (EN 150-155 / zh 70-80 full-width)
   [pass/fail] URL Slug lowercase English
   [pass/fail] Article + BreadcrumbList Schema generated
+  [pass/fail] No simplified or variant CJK glyphs — run a MECHANICAL scan
+              (regex for 们/后/发/这/换/说… and 羣/爲/裏 variants); eyeballing
+              misses single glyphs
 
-Score: X/15
+Score: X/18
 ```
 
-If score < 12/15, auto-fix failing items before presenting. Present fixed version.
+If score < 15/18, auto-fix failing items before presenting. Present fixed version.
 
 Wait for user confirmation. If user requests revisions, apply and re-check. Only proceed when approved.
 
@@ -250,6 +291,12 @@ Based on user's choice from Phase 0:
 > Tool names below assume a WordPress MCP server exposing `mcp__wordpress__*`.
 > Use the equivalent tools actually available in the session. If none exist,
 > tell the user and fall back to Option B.
+>
+> **Known non-WordPress path — zenbu site MCP**: map the steps 1:1 onto
+> `zenbu_list_categories` / `zenbu_create_category` / `zenbu_create_tag` /
+> `zenbu_list_articles` (for internal links) / `zenbu_create_article`
+> (create as draft; slug, description and SEO meta live on the article
+> fields). Report the article id/URL the same way.
 
 1. `mcp__wordpress__list_sites` — confirm target site
 2. `mcp__wordpress__list_categories` — find or create category via `mcp__wordpress__create_category`
@@ -266,7 +313,13 @@ Based on user's choice from Phase 0:
 ### Option B: Save as Markdown
 
 1. Save article to specified path (default `~/Desktop/[slug].md`)
-2. Include frontmatter:
+2. **Schema URLs**: a saved .md has no domain yet. If the target domain is
+   already known from the conversation, use it; otherwise use
+   `https://example.com/[slug]` placeholders in ALL Schema URLs
+   (mainEntityOfPage, BreadcrumbList items) and add a frontmatter comment:
+   `# 發佈時請把 schema 中的 example.com 換成實際網址`. Mention this in the
+   final report so it is not forgotten at publish time.
+3. Include frontmatter:
 ```yaml
 ---
 title: "Article Title"
@@ -278,7 +331,7 @@ schema: |
   [JSON-LD here]
 ---
 ```
-3. Report: file path
+4. Report: file path
 
 ---
 

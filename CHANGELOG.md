@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.1.0 — 2026-07-12
+
+第一次實戰跑完整流程（〈使用 AI 的五個層級〉）後的修正。核心教訓：預設寫法太學術、內容只有框架沒有血肉，另補幾個實務洞：
+
+- **引註白話化**（Phase 2 新增 Citation Style）：數據保留來源＋年份，但期刊名、paper 編號、「et al.」不進正文——改用「誰做了什麼研究」的講法。
+- **豐富度硬性要求**（Phase 2 新增 Richness Requirements）：每個 H2 至少一個具體物件——可複製的指令、❌/✅ 對照、生活場景清單、或第一人稱故事；純抽象論述過不了確認點 2。
+- **第一手素材掃描**（Phase 1 新增 Step 0）：research agent 出發前先找用戶自己的素材（課程字幕、舊文、逐字稿），用戶自己的框架與原話是最強的 E-E-A-T，外部研究是佐證不是主體。
+- **Meta Description 中文長度**：150–155 字元是英文規格，中文以 70–80 全形字為準（Google 對 CJK 約 80 字截斷）。
+- **品質檢查修正計數並擴充**：原清單實際列了 16 項卻標成 15；補上「每個 H2 有具體物件」與「簡體字／異體字機械掃描」（單一字元如「换」用肉眼會漏，必須跑 regex），現為 18 項、<15 分自動修。
+- **.md 發佈的 Schema 網址**（Phase 3 Option B）：存檔時沒有網域，一律用 `https://example.com/[slug]` 佔位＋frontmatter 註記，並在結案報告提醒替換。
+- **zenbu MCP 發佈路徑**（Phase 0 / Phase 3 Option A）：明列 zenbu 站台 MCP（`zenbu_create_article` 等）為已知發佈路徑，步驟與 WordPress 一對一對應。
+
 ## 1.0.0 — 2026-07-04
 
 從 [lukehsuhao/luke-claude-skills](https://github.com/lukehsuhao/luke-claude-skills) 抽出為獨立 repo，並做以下補強：

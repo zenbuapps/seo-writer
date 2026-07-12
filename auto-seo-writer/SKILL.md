@@ -119,6 +119,13 @@ Our Differentiation:
 Recommended word count: [X,XXX] (competitor avg + 20%)
 Recommended format: [guide / listicle / comparison]
 
+Real-example requests (include ONLY if first-person slots lack material)
+========================================================================
+[section A]: ✓ covered by first-party material ([which source])
+[section B]: MISSING — please share a real case / the actual details,
+             or reply "none" → will be written as a generic scenario
+             (not attributed to you)
+
 Proposed Outline
 ================
 
@@ -176,11 +183,27 @@ Every H2 section must contain at least ONE concrete artifact:
 - a copy-pasteable prompt or command the reader can try today, or
 - a ❌/✅ before-after example, or
 - a bulleted list of real-life scenarios ("接上之後日常長這樣"), or
-- a first-person story from the user's own experience (pull from the Phase 1
-  first-party material).
+- a first-person story from the user's own experience — ONLY from Phase 1
+  first-party material or facts the user explicitly provided.
 
 An H2 that is only abstract explanation fails Checkpoint 2. Framework tells,
 examples sell.
+
+### Real experiences only — NEVER fabricate
+First-person stories are E-E-A-T gold precisely because they are real:
+- Use ONLY experiences found in first-party material or told to you by the
+  user. A story's *existence* in the material does not license inventing its
+  *details* — numbers ("花了 20 分鐘"), prices, file contents, dialogue,
+  "我的學員…" anecdotes are all off-limits unless sourced.
+- Details you need but don't have: ask at CHECKPOINT 1 via the
+  "Real-example requests" block. Batch all asks there — do not scatter
+  questions through the flow.
+- If the user has no real example for a slot, write the passage as an
+  explicitly generic scenario (「想像一下」「常見的情境是」), never in the
+  user's first person.
+
+Fabricated experience is worse than no experience: one reader asking the
+author about it destroys the trust E-E-A-T exists to build.
 
 ### Content Format
 - H1 (unique) > H2 (main sections) > H3 (subsections) — never skip levels
@@ -258,7 +281,9 @@ AEO Optimization:
   [pass/fail] FAQPage Schema generated
 
 E-E-A-T / Richness:
-  [pass/fail] First-person testing/operation descriptions
+  [pass/fail] First-person testing/operation descriptions — every specific
+              (number, price, file content, anecdote) traceable to
+              first-party material or user-provided facts; none invented
   [pass/fail] Credible external sources cited
   [pass/fail] Author info configured
   [pass/fail] Every H2 has >= 1 concrete artifact (copyable prompt,

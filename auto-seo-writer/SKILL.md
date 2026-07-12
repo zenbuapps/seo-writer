@@ -1,186 +1,176 @@
 ---
 name: auto-seo-writer
-description: Use when the user wants to automatically generate SEO/AEO articles with minimal interaction. Triggers include writing SEO articles, auto-generating blog posts, batch content creation, or any request like "help me write an article about X." Automates research, writing, and publishing with only 2 confirmation checkpoints.
+description: Use when the user wants to generate SEO/AEO articles with a guided flow. Triggers include writing SEO articles, auto-generating blog posts, batch content creation, or any request like "help me write an article about X." Runs a 7-step flow (topic → research → outline → case interview → write → quality check → publish); every step explains itself and offers options with a recommended default, so experienced users move fast and new users always know where they are.
 argument-hint: [topic or keyword (optional)]
 ---
 
 # Auto SEO Writer
 
-Automated SEO/AEO article generator. Given a topic, automatically conducts research, writes the article, humanizes the text (removes AI writing patterns), and publishes — with only 2 confirmation checkpoints.
+Guided SEO/AEO article generator. One article = **7 steps**. At every step,
+tell the user in 1–2 sentences what this step does, then either offer options
+(recommended default first) or announce-and-proceed. Experienced users just
+take the default each time; new users always know where they are and where
+they can intervene.
 
-## Process Flow
+## The 7 Steps
 
 ```dot
 digraph auto_seo {
-    "Receive topic" [shape=box];
-    "Quick ask:\naudience + publish method" [shape=box];
-    "Parallel research\n(SERP, competitors, PAA, data)" [shape=box];
-    "CHECKPOINT 1:\nResearch summary + outline" [shape=diamond, style=filled, fillcolor="#FFE0B2"];
-    "Auto write article\n(AEO + E-E-A-T + Schema + Meta)" [shape=box];
-    "Humanize text\n(humanizer-tw skill)" [shape=box, style=filled, fillcolor="#C8E6C9"];
-    "CHECKPOINT 2:\nFull article + quality score" [shape=diamond, style=filled, fillcolor="#FFE0B2"];
-    "Publish (MCP or .md)" [shape=box];
-    "Report result" [shape=doublecircle];
+    rankdir=TB;
+    "1 Topic & Setup" [shape=box, style=filled, fillcolor="#FFF3E0"];
+    "2 Research (announce)" [shape=box];
+    "3 Outline approval" [shape=diamond, style=filled, fillcolor="#FFE0B2"];
+    "4 Case interview" [shape=box, style=filled, fillcolor="#FFF3E0"];
+    "5 Write + humanize (announce)" [shape=box];
+    "6 Quality check & approval" [shape=diamond, style=filled, fillcolor="#FFE0B2"];
+    "7 Publish & report" [shape=doublecircle];
 
-    "Receive topic" -> "Quick ask:\naudience + publish method";
-    "Quick ask:\naudience + publish method" -> "Parallel research\n(SERP, competitors, PAA, data)";
-    "Parallel research\n(SERP, competitors, PAA, data)" -> "CHECKPOINT 1:\nResearch summary + outline";
-    "CHECKPOINT 1:\nResearch summary + outline" -> "Parallel research\n(SERP, competitors, PAA, data)" [label="adjust"];
-    "CHECKPOINT 1:\nResearch summary + outline" -> "Auto write article\n(AEO + E-E-A-T + Schema + Meta)" [label="approved"];
-    "Auto write article\n(AEO + E-E-A-T + Schema + Meta)" -> "Humanize text\n(humanizer-tw skill)";
-    "Humanize text\n(humanizer-tw skill)" -> "CHECKPOINT 2:\nFull article + quality score";
-    "CHECKPOINT 2:\nFull article + quality score" -> "Humanize text\n(humanizer-tw skill)" [label="revise"];
-    "CHECKPOINT 2:\nFull article + quality score" -> "Publish (MCP or .md)" [label="approved"];
-    "Publish (MCP or .md)" -> "Report result";
+    "1 Topic & Setup" -> "2 Research (announce)" -> "3 Outline approval";
+    "3 Outline approval" -> "2 Research (announce)" [label="re-angle"];
+    "3 Outline approval" -> "4 Case interview" [label="approved"];
+    "4 Case interview" -> "5 Write + humanize (announce)" -> "6 Quality check & approval";
+    "6 Quality check & approval" -> "5 Write + humanize (announce)" [label="revise"];
+    "6 Quality check & approval" -> "7 Publish & report" [label="approved"];
 }
 ```
 
----
-
-## Phase 0: Quick Ask
-
-Only ask these 2 questions (can be in one message):
-
-```
-1. Target audience?
-   (e.g., marketers, WordPress site owners, e-commerce owners)
-
-2. How to publish?
-   a) MCP → which site? (list available sites via the WordPress MCP)
-   b) Save as .md → which path? (default: ~/Desktop/)
-```
-
-> **MCP tool names**: exact tool names depend on the connected MCP server
-> (examples in this skill assume `mcp__wordpress__*`). Check which CMS
-> MCP tools are actually available in the session before offering option (a) —
-> WordPress MCP servers AND zenbu site MCP servers (tools like
-> `zenbu_create_article`) both count. If neither is connected, only offer
-> option (b).
-
-If user gives no details, use defaults:
-- Audience: general readers interested in the topic
-- Publish: save as .md to ~/Desktop/
-
-Everything else (word count, article type, keyword strategy) is **auto-determined** from research results.
+**Interaction contract**
+- Steps 1, 3, 4, 6, 7 stop and offer options — put the recommended one first.
+- Steps 2 and 5 are **announce-only**: say what you're about to do and with
+  which defaults, invite override（「要改就喊」）, then proceed without waiting.
+- Never silently skip a step; if one has nothing to do (e.g. no case slots to
+  interview), say so in one line and move on.
 
 ---
 
-## Phase 1: Parallel Research
+## Step 1: Topic & Setup
 
-**Step 0 — First-party material scan (inline, before launching agents):**
-Check whether the user has first-hand material on this topic: course transcripts
-or subtitles, past articles, video scripts, slides, notes. Look in the working
-directory and project memory first; only ask if a known source is ambiguous.
-If found, extract the user's own framework, terminology, and signature phrases —
-these become the article's backbone and the strongest E-E-A-T signal (real
-first-person experience, not simulated). External research below then *supports*
-the user's framework instead of replacing it.
+Explain: we need three things — what to write, for whom, where to publish.
 
-Launch 3 parallel Agent tasks simultaneously:
+**Topic suggestions — this skill is generic. NEVER assume the user has
+courses, videos, or any particular content.** Source suggestions from what
+you actually know about this user: project memory, earlier conversations in
+this session, their site's existing content (via CMS MCP if connected). If
+you know nothing about them, ask open-ended, or offer to brainstorm from
+their niche. Suggested topics that build on their previous articles (topic
+clusters, internal links) are worth flagging as such.
+
+**Audience & publish method**: offer presets; if this user has generated
+articles before, "same as last time" is the recommended default.
+- Publish options depend on what's connected: WordPress MCP or zenbu site MCP
+  (tools like `zenbu_create_article`) → offer CMS draft; always offer
+  "save as .md" (default path `~/Desktop/`).
+
+If the user gives no details: audience = general readers interested in the
+topic; publish = .md to ~/Desktop/. Word count, article type, and keyword
+strategy are auto-determined by research — do not ask.
+
+---
+
+## Step 2: Research (announce-only)
+
+Announce: what's about to happen（先掃你的第一手素材，再派三路研究，大約幾分鐘）
+and the default depth. Offer the alternatives in the same breath, then proceed:
+- **Full**（推薦）: first-party scan + 3 parallel agents (below)
+- **Quick**: first-party scan + SERP agent only — for time-sensitive or
+  low-stakes posts
+- **Skip**: write from existing knowledge — flag clearly that data points and
+  FAQ will be weaker
+
+**First-party material scan (inline, before launching agents):**
+Check whether the user has first-hand material on this topic: anything —
+past articles, transcripts, notes, docs, product data, prior conversations.
+Look in the working directory and project memory; only ask if a known source
+is ambiguous. Whatever is found becomes the article's backbone and the
+strongest E-E-A-T signal; external research *supports* it rather than
+replacing it. Finding nothing is fine — Step 4 covers experience.
 
 **Agent A: SERP + Competitor Analysis**
-- WebSearch the primary keyword
-- Record SERP features (Featured Snippet, PAA, AI Overview, video carousel)
+- WebSearch the primary keyword; record SERP features (Featured Snippet, PAA,
+  AI Overview, video carousel — mark inferences as inferences)
 - Determine search intent (informational / commercial / navigational / transactional)
-- WebFetch top 3-5 ranking articles
-- Extract: heading structure, word count, subtopics covered, strengths, weaknesses, content gaps
+- WebFetch top 3-5 ranking articles; extract heading structure, word count,
+  subtopics, strengths, weaknesses, content gaps
 
 **Agent B: PAA + Community Questions**
 - WebSearch keyword variations: "[keyword] what/how/why/comparison/FAQ/recommended"
-- Search English PAA if topic has English equivalent
-- Search Reddit, PTT, forums for real user questions
+- Search English PAA if the topic has an English equivalent
+- Search Reddit, PTT, Dcard, Threads, forums for real user questions
 - Categorize: definition / how-to / comparison / reason / recommendation
 
 **Agent C: Data + Authority Sources**
 - WebSearch: "[topic] statistics [current year]", "[topic] research report", "[topic] trends"
-- Prioritize: Tier 1 (government, academic) > Tier 2 (Gartner, McKinsey) > Tier 3 (industry media)
+- Prioritize: Tier 1 (government, academic) > Tier 2 (major-institution or
+  official reports) > Tier 3 (industry media — label as 業界估計 when cited)
 - Record: data point, source, year, URL, credibility tier
 - Cross-verify key stats with 2+ independent sources
 
 ---
 
-## CHECKPOINT 1: Research Summary + Outline
+## Step 3: Outline Approval (stop for options)
 
-Present to user:
+Present, in this order:
 
 ```
 Research Summary
 ================
-
 Search Intent: [type] — users want to [...]
 Competitors: analyzed X articles, avg word count Y
 Key Gap: competitors lack [...]
 Data Points: collected X citable stats
 User Questions: mined X PAA questions
 
-Our Differentiation:
-  [one sentence on unique value]
-
+Our Differentiation: [one sentence on unique value]
 Recommended word count: [X,XXX] (competitor avg + 20%)
 Recommended format: [guide / listicle / comparison]
 
 Case material status (one line per first-person slot):
   ✓ [section A] — covered by first-party material ([which source])
-  ? [section B, C] — will interview you after you approve the outline
+  ? [section B, C] — will interview you in the next step
 
 Proposed Outline
 ================
-
 # H1: [title with primary keyword, under 60 chars]
-
-## H2: What is [topic]? (definition block)
-## H2: Why [topic] matters
-   ### H3: [subtopic 1]
-   ### H3: [subtopic 2]
-## H2: How to [do something] — step-by-step
-   ### H3: Step 1
-   ### H3: Step 2
-## H2: [topic] best practices
-## H2: Common mistakes
-## H2: FAQ (from PAA)
-## H2: Conclusion + action items
-
-Proceed? Or adjust anything?
+## H2 ... (question-format headings, definition block first, FAQ from PAA,
+   conclusion + action items last)
 ```
 
-Wait for user confirmation. If user adjusts, revise and re-present. Only proceed when approved.
+Options: **照大綱進行（推薦）** / 調整章節（說哪裡） / 換切入角度重做研究。
+Only proceed when approved.
 
 ---
 
-## Phase 1.5: Case Interview (only if slots lack material)
+## Step 4: Case Interview (stop, conversational)
 
-Runs right after the outline is approved, for first-person slots NOT covered
-by first-party material. This is a short exploratory interview, NOT a form —
-one open question at a time, conversational tone.
+Explain in one line why this step exists: 真實案例是 E-E-A-T 的核心，編造的
+經驗被讀者戳破一次就毀掉信任。Then interview — exploratory, NOT a form:
 
-1. **Open broad.** One question, all slots at once:
-   「這篇有幾個地方放你的真實案例會很加分：〔段落 1、2、3〕。
+1. **Open broad.** One question, all unsourced slots at once:
+   「這篇有幾個地方放你的真實案例會很加分：〔段落們〕。
    你有沒有相關的經驗？想到什麼講什麼，不用完整。」
-2. **Dig when they bite.** When the user mentions anything, follow up like
-   an interviewer — at most 1–3 short questions per case（什麼時候？後來呢？
-   有具體數字嗎？）. Stop as soon as you have enough for one vivid
-   paragraph. Never interrogate.
-3. **Offer an out when they don't.** If the user doesn't want to share
-   details or has nothing:
+2. **Dig when they bite.** Follow up like an interviewer — at most 1–3 short
+   questions per case（什麼時候？後來呢？有具體數字嗎？）. Stop as soon as you
+   have enough for one vivid paragraph. Never interrogate.
+3. **Offer an out when they don't.**
    - 「那我幫你編一個？給我一個大方向就好」(user gives direction, AI drafts)
-   - 「或是我提一個方向，你看行不行」(AI proposes direction, then drafts)
+   - 「或是我提一個方向，你看行不行」(AI proposes, then drafts)
    - rewrite the slot as a non-first-person generic scenario, or drop it.
-4. **Confirm before writing — always.** Any case the AI drafted, or any
-   detail extrapolated beyond what the user literally said, must be played
-   back verbatim before Phase 2:
-   「這個案例我打算這樣寫：『……』這樣 OK 嗎？」
-   Only approved drafts enter the article. Once the user approves the
-   concrete text, it may be written in their first person — approval
-   transfers ownership.
+4. **Confirm before writing — always.** Any case the AI drafted, or any detail
+   extrapolated beyond what the user literally said, must be played back
+   verbatim before Step 5:「這個案例我打算這樣寫：『……』這樣 OK 嗎？」
+   Only approved drafts enter the article. Once the user approves the concrete
+   text, it may be written in their first person — approval transfers ownership.
 
-Keep the whole interview to a handful of turns. It does not count as a
-checkpoint; it is a conversation.
+If every slot is already covered by first-party material, say so in one line
+and move straight to Step 5. Keep the whole interview to a handful of turns.
 
 ---
 
-## Phase 2: Auto Write
+## Step 5: Write + Humanize (announce-only)
 
-Once outline approved, write the full article automatically. Follow these rules:
+Announce: 開始撰文，套用的規則（AEO 直答、白話引註、去 AI 味）＋預設語氣與
+字數，邀請覆寫（標準（推薦）／更口語／更專業；字數照研究建議或指定），then
+write without waiting.
 
 ### AEO Golden Rules
 - First 40-60 chars of every H2/H3 section: **direct answer** (no filler intros)
@@ -190,7 +180,7 @@ Once outline approved, write the full article automatically. Follow these rules:
 - Consistent entity naming throughout
 
 ### E-E-A-T Signals
-- **Experience**: include first-person testing/operation descriptions
+- **Experience**: first-person testing/operation descriptions (sourced per Step 4)
 - **Expertise**: specific numbers, technical details, correct terminology
 - **Authoritativeness**: cite credible sources (reports, official docs, institutions)
 - **Trustworthiness**: mark data sources, update dates, present pros AND cons
@@ -203,38 +193,26 @@ sentence like a person talking, not a paper:
 - ❌ 「（NBER Working Paper w34255，2025）」
 - ❌ 「（Brynjolfsson et al.，《Quarterly Journal of Economics》，2025）」
 
-Journal names, paper IDs, and "et al." never appear in the body — describe *who
-found it* instead. Keep full academic references in research notes only.
+Journal names, paper IDs, and "et al." never appear in the body — describe
+*who found it* instead. Keep full academic references in research notes only.
 
-### Richness Requirements
-Every H2 section must contain at least ONE concrete artifact:
-- a copy-pasteable prompt or command the reader can try today, or
-- a ❌/✅ before-after example, or
-- a bulleted list of real-life scenarios ("接上之後日常長這樣"), or
-- a first-person story from the user's own experience — ONLY from Phase 1
-  first-party material or facts the user explicitly provided.
-
-An H2 that is only abstract explanation fails Checkpoint 2. Framework tells,
-examples sell.
+### Concrete artifacts — where they add value, not everywhere
+Copyable prompts/commands, ❌/✅ before-after examples, real-life scenario
+lists, and first-person stories are what make sections land — use them
+generously in how-to and comparison sections. But do NOT force one into every
+H2: a conceptual or transitional section is allowed to just explain. The test
+is "would a reader try or feel something here?", not a per-section quota.
 
 ### Real experiences only — NEVER fabricate silently
-First-person stories are E-E-A-T gold precisely because they are real:
-- Use ONLY experiences found in first-party material, told to you by the
-  user, or drafted-and-approved via the Case Interview (Phase 1.5). A
-  story's *existence* in the material does not license inventing its
-  *details* — numbers ("花了 20 分鐘"), prices, file contents, dialogue,
-  "我的學員…" anecdotes are all off-limits unless sourced or approved.
-- Do not start Phase 2 while any first-person slot is unresolved
-  (sourced / user-told / user-approved draft / rewritten generic / dropped).
-
-Fabricated experience is worse than no experience: one reader asking the
-author about it destroys the trust E-E-A-T exists to build.
+- Use ONLY experiences found in first-party material, told to you by the user,
+  or drafted-and-approved in Step 4. A story's *existence* in the material
+  does not license inventing its *details* — numbers, prices, file contents,
+  dialogue, "我的學員…" anecdotes are off-limits unless sourced or approved.
+- Do not write while any first-person slot is unresolved.
 
 ### Content Format
 - H1 (unique) > H2 (main sections) > H3 (subsections) — never skip levels
-- Paragraphs: 3-5 sentences, under 120 chars per dense block
-- Lists: use for 3+ parallel items
-- Bold: max 1-2 key concepts per paragraph
+- Paragraphs: 3-5 sentences; lists for 3+ parallel items; bold max 1-2 per paragraph
 
 ### Required Elements
 1. **Definition box** at article start:
@@ -243,49 +221,27 @@ author about it destroys the trust E-E-A-T exists to build.
 <strong>[Topic]</strong>: [40-60 char precise definition, AI-quotable format]
 </div>
 ```
-
 2. **FAQ section** (5+ Q&As from PAA research)
-
 3. **Schema Markup** (JSON-LD): Article + FAQPage + BreadcrumbList
+4. **SEO Meta**: Title Tag (under 60 chars, contains primary keyword);
+   Meta Description (has CTA; **length by script**: English 150-155 chars,
+   Chinese 70-80 full-width — Google truncates CJK around 80 glyphs);
+   Focus Keyword; URL Slug (lowercase English, hyphens)
 
-4. **SEO Meta**:
-   - Title Tag (under 60 chars, contains primary keyword)
-   - Meta Description (has CTA; **length by script**: English 150-155 chars,
-     Chinese 70-80 full-width chars — Google truncates CJK around 80 glyphs,
-     so the 150-155 rule written for English does NOT apply to 中文)
-   - Focus Keyword
-   - URL Slug (lowercase English, hyphens)
-
----
-
-## Phase 2.5: Humanize Text
-
-After writing is complete, remove AI writing patterns from the article. This step is automatic — do NOT skip it.
-
-**Invoke the `humanizer-tw` skill if it is installed.** If it is not available in this session, do NOT skip this phase — apply the rules below directly yourself:
-
-- Remove opening clichés (「隨著...的發展」「眾所周知」)
-- Cut excessive connectors (「此外」「與此同時」「首先...其次...最後」)
-- Replace internet jargon with plain words
-- Fix translation-ese (「這是一個...的事情」, stacked 「的」)
-- Make formal language conversational (「予以」→「給」, 「該」→「這個」)
-- Vary sentence rhythm (mix short and long sentences)
-- Break formulaic structures (intro-3points-conclusion)
-- Replace cliché endings with specific conclusions
-- Inject personality and real voice
-
-**Important**: Preserve all SEO elements during humanization:
-- Keep H1/H2/H3 structure and keywords intact
-- Keep data citations with sources and years
-- Keep the definition box, FAQ section, and Schema markup
-- Keep the AEO direct-answer openings (first 40-60 chars of each section)
-- Only rewrite the prose style, not the informational structure
+### Humanize (same pass, do not skip)
+**Invoke the `humanizer-tw` skill if installed**; otherwise apply directly:
+remove opening clichés（「隨著…的發展」「眾所周知」）; cut excessive connectors
+（「此外」「與此同時」「首先…其次…最後」）; replace internet jargon（賦能／痛點／
+閉環）; fix translation-ese; make formal language conversational; vary sentence
+rhythm; break formulaic structures; replace cliché endings; inject real voice.
+Preserve all SEO elements: heading structure and keywords, data citations with
+source+year, definition box, FAQ, Schema, and the AEO direct-answer openings.
 
 ---
 
-## CHECKPOINT 2: Article + Quality Check
+## Step 6: Quality Check & Approval (stop for options)
 
-Present the full article and auto-run quality check:
+Present the full article (send the file) and the check:
 
 ```
 Quality Check (X/18)
@@ -306,14 +262,16 @@ AEO Optimization:
   [pass/fail] FAQPage Schema generated
 
 E-E-A-T / Richness:
-  [pass/fail] First-person testing/operation descriptions — every specific
-              (number, price, file content, anecdote) traceable to
-              first-party material, user-told facts, or a Case-Interview
-              draft the user approved verbatim; nothing silently invented
+  [pass/fail] First-person descriptions — every specific (number, price,
+              file content, anecdote) traceable to first-party material,
+              user-told facts, or a Step-4 draft approved verbatim;
+              nothing silently invented
   [pass/fail] Credible external sources cited
   [pass/fail] Author info configured
-  [pass/fail] Every H2 has >= 1 concrete artifact (copyable prompt,
-              ❌/✅ example, scenario list, or first-person story)
+  [pass/fail] Concrete artifacts (copyable prompt, ❌/✅ example, scenario
+              list, first-person story) present where they add value —
+              most how-to/comparison sections have one; not forced into
+              every H2
 
 SEO Technical:
   [pass/fail] Title Tag <= 60 chars
@@ -321,81 +279,68 @@ SEO Technical:
   [pass/fail] URL Slug lowercase English
   [pass/fail] Article + BreadcrumbList Schema generated
   [pass/fail] No simplified or variant CJK glyphs — run a MECHANICAL scan
-              (regex for 们/后/发/这/换/说… and 羣/爲/裏 variants); eyeballing
-              misses single glyphs
+              (regex for 们/后/发/这/换/说… and 羣/爲/裏 variants; exclude
+              intentional demo lines); eyeballing misses single glyphs
 
 Score: X/18
 ```
 
-If score < 15/18, auto-fix failing items before presenting. Present fixed version.
+If score < 15/18, auto-fix failing items before presenting. Additionally,
+list any phrasings you synthesized from records (rather than the user's
+literal words) so the user can veto them.
 
-Wait for user confirmation. If user requests revisions, apply and re-check. Only proceed when approved.
+Options: **發佈（推薦，若全過）** / 指定段落修改 / 整篇調性重修。
+Only proceed when approved.
 
 ---
 
-## Phase 3: Publish
+## Step 7: Publish & Report
 
-Based on user's choice from Phase 0:
+Explain where it's going, then execute per Step 1's choice:
 
-### Option A: MCP Publish
+### Option A: CMS via MCP
 
-> Tool names below assume a WordPress MCP server exposing `mcp__wordpress__*`.
-> Use the equivalent tools actually available in the session. If none exist,
-> tell the user and fall back to Option B.
->
-> **Known non-WordPress path — zenbu site MCP**: map the steps 1:1 onto
-> `zenbu_list_categories` / `zenbu_create_category` / `zenbu_create_tag` /
-> `zenbu_list_articles` (for internal links) / `zenbu_create_article`
-> (create as draft; slug, description and SEO meta live on the article
-> fields). Report the article id/URL the same way.
+> Tool names below assume `mcp__wordpress__*`; use whatever CMS MCP the
+> session actually has. **zenbu site MCP** maps 1:1: `zenbu_list_categories` /
+> `zenbu_create_category` / `zenbu_create_tag` / `zenbu_list_articles`
+> (internal links) / `zenbu_create_article` (draft; slug, description and SEO
+> meta live on the article fields).
 
-1. `mcp__wordpress__list_sites` — confirm target site
-2. `mcp__wordpress__list_categories` — find or create category via `mcp__wordpress__create_category`
-3. `mcp__wordpress__list_tags` — find or create tags via `mcp__wordpress__create_tag`
-4. **Internal links**: search the site's existing posts (list/search posts) for 2-3
-   relevant articles and link to them where naturally fitting in the body.
-   Skip silently if the site has no related content yet.
-5. `mcp__wordpress__create_post` — publish with:
-   - title, content (HTML), excerpt, slug, status (draft first)
-   - categories, tags
-   - SEO meta (Yoast/RankMath fields if supported)
-6. Report: post ID, URL, status
+1. Confirm target site; find-or-create category and tags
+2. **Internal links**: search existing posts for 2-3 relevant articles and
+   link them naturally in the body (skip silently if none)
+3. Create post as draft (title, HTML content, excerpt, slug, categories,
+   tags, SEO meta fields if supported)
+4. Report: post ID, URL, status
 
 ### Option B: Save as Markdown
 
-1. Save article to specified path (default `~/Desktop/[slug].md`)
-2. **Schema URLs**: a saved .md has no domain yet. If the target domain is
-   already known from the conversation, use it; otherwise use
-   `https://example.com/[slug]` placeholders in ALL Schema URLs
-   (mainEntityOfPage, BreadcrumbList items) and add a frontmatter comment:
-   `# 發佈時請把 schema 中的 example.com 換成實際網址`. Mention this in the
-   final report so it is not forgotten at publish time.
-3. Include frontmatter:
-```yaml
----
-title: "Article Title"
-date: YYYY-MM-DD
-slug: article-slug
-keywords: [primary, secondary1, secondary2]
-description: "Meta description"
-schema: |
-  [JSON-LD here]
----
-```
+1. Save to the chosen path (default `~/Desktop/[slug].md`)
+2. **Schema URLs**: no domain yet — use the target domain if known from
+   conversation, else `https://example.com/[slug]` placeholders in ALL Schema
+   URLs, plus a frontmatter comment:
+   `# 發佈時請把 schema 中的 example.com 換成實際網址`. Repeat this reminder
+   in the final report.
+3. Frontmatter: title / date / slug / keywords / description / schema (JSON-LD)
 4. Report: file path
+
+Close with a one-line suggestion for the next article (topic cluster /
+internal-link opportunities discovered during research).
 
 ---
 
 ## Batch Mode
 
-When the user provides multiple topics at once (a list, a spreadsheet, or "write articles about A, B, and C"), keep the same 2-checkpoint total — do NOT checkpoint per article:
-
-1. **Phase 0 once** — one audience + one publish method for the whole batch (ask only if unclear).
-2. **Research each topic** (Phase 1) — topics sequentially, the 3 agents within each topic in parallel.
-3. **CHECKPOINT 1 (batch)** — present ALL research summaries + outlines in one message, clearly numbered per topic. User approves or adjusts per topic; only approved topics continue.
-4. **Write + humanize** each approved article (Phase 2 + 2.5).
-5. **CHECKPOINT 2 (batch)** — present each article's quality score and full text (or file path). User approves per article.
-6. **Publish** all approved articles (Phase 3), then report one result table: topic / status / URL or file path.
+Multiple topics at once: run the same 7 steps, but batch the stops so total
+interaction stays low:
+1. **Step 1 once** for the whole batch (one audience + publish method)
+2. **Step 2** per topic (agents within each topic in parallel)
+3. **Step 3 batched** — ALL research summaries + outlines in one message,
+   numbered; user approves/adjusts per topic
+4. **Step 4 batched** — one interview covering all topics' open slots
+5. **Steps 5** per approved topic
+6. **Step 6 batched** — every article's score + file; user approves per article
+7. **Step 7** — publish all approved, report one table: topic / status / URL or path
 
 ---
 

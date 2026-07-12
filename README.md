@@ -1,23 +1,22 @@
 # Auto SEO Writer
 
-自動化的 SEO/AEO 文章產生器（Claude Code Skill）。給一個主題，自動完成研究 → 撰文 → humanize（去除 AI 生成痕跡）→ 發佈，全程只有 **2 個確認點**。
+引導式的 SEO/AEO 文章產生器（Claude Code Skill）。一篇文章＝ **7 個步驟**，每一步都先講清楚「現在要幹嘛」，再給附推薦預設的選項——熟手一路按預設走，速度跟全自動差不多；新手每一步都知道自己在哪、可以介入什麼。
 
-適合已經熟悉 SEO 文章產出流程、想要盡量減少互動的情境。想要每一步都參與討論的話，用互動版的 [`seo-aeo-master`](https://github.com/lukehsuhao/luke-claude-skills) 更合適。
-
-## 流程
+## 七步流程
 
 ```
-收到主題
-  → 快問兩題（受眾＋發佈方式）
-  → 三路並行研究（SERP 競品／PAA 真實提問／權威數據）
-  → ✅ 確認點 1：研究摘要＋文章大綱
-  → 自動撰文（AEO 直答開頭＋E-E-A-T＋Schema＋Meta）
-  → humanize 去 AI 味（humanizer-tw）
-  → ✅ 確認點 2：全文＋18 項品質檢查（<15 分自動修到過）
-  → 發佈（WordPress MCP 或存 .md）
+1 定題      問主題／受眾／發佈方式（主題建議來自 AI 對你的既有認識，不預設你有任何內容）
+2 研究      宣告後直接進行：掃你的第一手素材＋三路並行研究（SERP 競品／PAA 真實提問／權威數據）
+3 大綱確認  ✅ 研究摘要＋大綱＋案例素材狀態（照大綱走／調整／換角度）
+4 案例採訪  聊天式問你有沒有真實案例；不想講可讓 AI 編，但編的內容落筆前必逐字給你確認
+5 撰文      宣告後直接進行：AEO＋E-E-A-T＋白話引註＋humanize 去 AI 味（humanizer-tw）
+6 品檢定稿  ✅ 全文＋18 項品質檢查（<15 分自動修到過）＋歸納寫法逐項給你過目
+7 發佈      CMS MCP 草稿或存 .md，回報結果＋下一篇建議
 ```
 
-也支援**批次模式**：一次丟多個主題，維持總共 2 個確認點（大綱一批確認、成文一批確認），不會每篇都停下來問。
+**真實案例原則**：第一人稱經驗只能來自你的素材、你親口說的、或你逐字核可過的草稿——AI 不會替你編故事。
+
+也支援**批次模式**：一次丟多個主題，停下來的步驟（3、4、6）整批處理，不會每篇都問一輪。
 
 ## 安裝
 
@@ -43,6 +42,7 @@ git clone https://github.com/yelban/humanizer.TW.git ~/.claude/skills/humanizer-
 | 方式 | 說明 |
 |---|---|
 | WordPress MCP | 有連 WordPress MCP server 時，直接建分類/標籤、補站內連結、以草稿發佈（含 Yoast/RankMath SEO meta） |
+| zenbu MCP | 有連 zenbu 站台 MCP 時，同樣流程對應到 `zenbu_create_article` 等工具，以草稿建立 |
 | Markdown 檔 | 存成含 frontmatter（title/slug/keywords/description/Schema）的 `.md`，預設到 `~/Desktop/` |
 
 ## 產出規格
